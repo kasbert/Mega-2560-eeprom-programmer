@@ -10,7 +10,7 @@ Build and attach adapter (LED's + resistors are optional):
 
 PCB Eagle+Gerber (Elecrow/Jclpcb) are in EEpromer.zip:
 
-![PCB](https://github.com/petersieg/arduino/blob/master/eeprom/EEpromer.png)
+![PCB](https://github.com/petersieg/eeprom/blob/master/EEpromer.png)
 
 2 Jumper at 1 are for 28C256 and 28C64.
 2 Jumper at 2 are for 28C16.
