@@ -15,6 +15,10 @@ PCB Eagle+Gerber (Elecrow/Jclpcb) are in EEpromer.zip:
 2 Jumper at 1 are for 28C256 and 28C64.
 2 Jumper at 2 are for 28C16.
 
+PCB's arrived and they work as expected.
+
+![JCLPCB](https://github.com/petersieg/eeprom/blob/master/EEprommer%20Adapter.jpeg)
+
 Header from INO:
 
 ```code
