@@ -8,7 +8,7 @@ http://danceswithferrets.org/geekblog/?p=496
 Just upload sketch into Mega 2560 arduino.
 Build and attach adapter (LED's + resistors are optional):
 
-PCB Eagle+Gerber (Elecrow/Jclpcb) are in EEpromer.zip:
+PCB Eagle+Gerber (Elecrow/Jlcpcb) are in EEpromer.zip:
 
 ![PCB](https://github.com/petersieg/eeprom/blob/master/EEpromer.png)
 
