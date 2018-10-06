@@ -6,6 +6,8 @@
 # -s file.bin (programming)         - program eeprom with file.bin
 # -v file.bin (verify content)      - verify eeprom with file.bin
 # -S file.bin ('smart' programming) - smart programming with file.bin
+# -U                                - disable write protection
+# -P                                - enable write protection
 #
 # Normally takes 196 seconds to program a 28C64, and 32 seconds to read.
 # --
@@ -56,6 +58,20 @@ def waitokay():
         if bad > 50:
             sys.exit("eh")
 
+
+if s == "-U":
+    s = "U"
+    print s
+    ser.write(s + chr(10))
+    s = ser.readline()
+    print s
+
+if s == "-P":
+    s = "P"
+    print s
+    ser.write(s + chr(10))
+    s = ser.readline()
+    print s
 
 if s == "-b":
     a = 0
