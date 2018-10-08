@@ -15,6 +15,7 @@
 //                  delayMicroseconds(k_uTime_WritePulse_uS);
 //  06th Oct 2018 - P. Sieg
 //                - corrected SDP (un)protect adresses
+//                - Change k_uTime_WriteDelay_uS by -d (5) or -D (500)
 //
 //
 // Distributed under an acknowledgement licence, because I'm a shallow, attention-seeking tart. :)
@@ -42,7 +43,7 @@ const char hex[] =
   '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
 
-const char version_string[] = {"EEPROM Version=0.02a"};
+const char version_string[] = {"EEPROM Version=0.03"};
 
 static const int kPin_Addr14  = 24;
 static const int kPin_Addr12  = 26;
@@ -80,7 +81,7 @@ byte buffer[kMaxBufferSize];
 
 static const long int k_uTime_WritePulse_uS = 1; 
 static const long int k_uTime_ReadPulse_uS = 1;
-static const long int k_uTime_WriteDelay_uS = 5; // delay between byte writes - needed for at28c16
+             long int k_uTime_WriteDelay_uS = 5; // delay between byte writes - needed for at28c16
 // (to be honest, both of the above are about ten times too big - but the Arduino won't reliably
 // delay down at the nanosecond level, so this is the best we can do.)
 
@@ -135,6 +136,8 @@ void loop()
       case 'U': SetSDPState(false); break;
       case 'R': ReadEEPROM(); break;
       case 'W': WriteEEPROM(); break;
+      case 'D': k_uTime_WriteDelay_uS=500; Serial.println("WriteDelay=500"); break;
+      case 'd': k_uTime_WriteDelay_uS=5;   Serial.println("WriteDelay=5");   break;
       case 0: break; // empty string. Don't mind ignoring this.
       default: Serial.println("ERR Unrecognised command"); break;
     }
