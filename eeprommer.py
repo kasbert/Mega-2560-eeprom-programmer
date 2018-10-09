@@ -8,8 +8,9 @@
 # -S file.bin ('smart' programming) - smart programming with file.bin
 # -U                                - disable write protection
 # -P                                - enable write protection
-# -d                                - WriteDelay=5   (for 28C256/64)
-# -D                                - WriteDelay=500 (for 28C16)
+# -A                                - set parameters for 28C16
+# -B                                - set parameters for 28C64
+# -C                                - set parameters for 28C256
 #
 # Normally takes 196 seconds to program a 28C64, and 32 seconds to read.
 # --
@@ -61,15 +62,22 @@ def waitokay():
             sys.exit("eh")
 
 
-if s == "-d":
-    s = "d"
+if s == "-A":
+    s = "A"
     print s
     ser.write(s + chr(10))
     s = ser.readline()
     print s
 
-if s == "-D":
-    s = "D"
+if s == "-B":
+    s = "B"
+    print s
+    ser.write(s + chr(10))
+    s = ser.readline()
+    print s
+
+if s == "-C":
+    s = "C"
     print s
     ser.write(s + chr(10))
     s = ser.readline()

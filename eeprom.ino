@@ -14,8 +14,8 @@
 //                  static const long int k_uTime_WriteDelay_uS = 500; // delay between byte writes - needed for at28c16
 //                  delayMicroseconds(k_uTime_WritePulse_uS);
 //  06th Oct 2018 - P. Sieg
-//                - corrected SDP (un)protect adresses
-//                - Change k_uTime_WriteDelay_uS by -d (5) or -D (500)
+//                - corrected SDP (un)protect adresses & k_uTime_WriteDelay_uS
+//                - Set parameters -A=28C16; -B=28C64; -C=28C256
 //
 //
 // Distributed under an acknowledgement licence, because I'm a shallow, attention-seeking tart. :)
@@ -29,6 +29,9 @@
 // P                                      - set write-protection bit (Atmels only, AFAIK)
 // U                                      - clear write-protection bit (ditto)
 // V                                      - prints the version string
+// A                                      - set parameters for 28C16
+// B                                      - set parameters for 28C64
+// C                                      - set parameters for 28C256
 //
 // Any data read from the EEPROM will have a CRC checksum appended to it (separated by a comma).
 // If a string of data is sent with an optional checksum, then this will be checked
@@ -43,7 +46,7 @@ const char hex[] =
   '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
 
-const char version_string[] = {"EEPROM Version=0.03"};
+const char version_string[] = {"EEPROM Version=0.04"};
 
 static const int kPin_Addr14  = 24;
 static const int kPin_Addr12  = 26;
@@ -84,7 +87,7 @@ static const long int k_uTime_ReadPulse_uS = 1;
              long int k_uTime_WriteDelay_uS = 5; // delay between byte writes - needed for at28c16
 // (to be honest, both of the above are about ten times too big - but the Arduino won't reliably
 // delay down at the nanosecond level, so this is the best we can do.)
-
+             long int SDPadr1=0x5555, SDPadr2=0x2AAA; // default 28C256
 // the setup function runs once when you press reset or power the board
 void setup()
 {
@@ -136,8 +139,12 @@ void loop()
       case 'U': SetSDPState(false); break;
       case 'R': ReadEEPROM(); break;
       case 'W': WriteEEPROM(); break;
-      case 'D': k_uTime_WriteDelay_uS=500; Serial.println("WriteDelay=500"); break;
-      case 'd': k_uTime_WriteDelay_uS=5;   Serial.println("WriteDelay=5");   break;
+      case 'A': k_uTime_WriteDelay_uS=500;  
+                SDPadr1=-1; SDPadr2=-1; Serial.println("Set params for 28C16");break;
+      case 'B': k_uTime_WriteDelay_uS=5;  
+                SDPadr1=0x1555; SDPadr2=0x0AAA; Serial.println("Set params for 28C64");break;
+      case 'C': k_uTime_WriteDelay_uS=5;  
+                SDPadr1=0x5555; SDPadr2=0x2AAA; Serial.println("Set params for 28C256");break;
       case 0: break; // empty string. Don't mind ignoring this.
       default: Serial.println("ERR Unrecognised command"); break;
     }
@@ -253,6 +260,10 @@ void WriteEEPROM() // W<four byte hex address>:<data in hex, two characters per 
 
 void SetSDPState(bool bWriteProtect)
 {
+  if (SDPadr1 < 0) {
+    Serial.println("SDP feature not supported by chip");
+    return;
+  }
   digitalWrite(kPin_LED_Red, HIGH);
 
   digitalWrite(kPin_nWE, HIGH); // disables write
@@ -267,18 +278,18 @@ void SetSDPState(bool bWriteProtect)
 
   if (bWriteProtect)
   {
-    WriteByteTo(0x5555, 0xAA);
-    WriteByteTo(0x2AAA, 0x55);
-    WriteByteTo(0x5555, 0xA0);
+    WriteByteTo(SDPadr1, 0xAA);
+    WriteByteTo(SDPadr2, 0x55);
+    WriteByteTo(SDPadr1, 0xA0);
   }
   else
   {
-    WriteByteTo(0x5555, 0xAA);
-    WriteByteTo(0x2AAA, 0x55);
-    WriteByteTo(0x5555, 0x80);
-    WriteByteTo(0x5555, 0xAA);
-    WriteByteTo(0x2AAA, 0x55);
-    WriteByteTo(0x5555, 0x20);
+    WriteByteTo(SDPadr1, 0xAA);
+    WriteByteTo(SDPadr2, 0x55);
+    WriteByteTo(SDPadr1, 0x80);
+    WriteByteTo(SDPadr1, 0xAA);
+    WriteByteTo(SDPadr2, 0x55);
+    WriteByteTo(SDPadr1, 0x20);
   }
   
   WriteByteTo(0x0000, bytezero); // this "dummy" write is required so that the EEPROM will flush its buffer of commands.
