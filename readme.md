@@ -37,23 +37,10 @@ Header from INO:
 //  21st Feb 2018 - P. Sieg
 //                  static const long int k_uTime_WriteDelay_uS = 500; // delay between byte writes - needed for at28c16
 //                  delayMicroseconds(k_uTime_WritePulse_uS);
+//  06th Oct 2018 - P. Sieg
+//                - corrected SDP (un)protect adresses & k_uTime_WriteDelay_uS
+//                - Set parameters -A=28C16; -B=28C64; -C=28C256
 //
-//
-// Distributed under an acknowledgement licence, because I'm a shallow, attention-seeking tart. :)
-//
-// http://danceswithferrets.org/geekblog/?page_id=903
-//
-// This software presents a 9600-8N1 serial port.
-//
-// R[hex address]                         - reads 16 bytes of data from the EEPROM
-// W[hex address]:[data in two-char hex]  - writes up to 16 bytes of data to the EEPROM
-// P                                      - set write-protection bit (Atmels only, AFAIK)
-// U                                      - clear write-protection bit (ditto)
-// V                                      - prints the version string
-//
-// Any data read from the EEPROM will have a CRC checksum appended to it (separated by a comma).
-// If a string of data is sent with an optional checksum, then this will be checked
-// before anything is written.
 ```
 ---
 
