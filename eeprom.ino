@@ -32,6 +32,8 @@
 // A                                      - set parameters for 28C16
 // B                                      - set parameters for 28C64
 // C                                      - set parameters for 28C256
+// +                                      - k_uTime_WritePulse_uS + 50
+// -                                      - k_uTime_WritePulse_uS - 50
 //
 // Any data read from the EEPROM will have a CRC checksum appended to it (separated by a comma).
 // If a string of data is sent with an optional checksum, then this will be checked
@@ -84,7 +86,7 @@ byte buffer[kMaxBufferSize];
 
 static const long int k_uTime_WritePulse_uS = 1; 
 static const long int k_uTime_ReadPulse_uS = 1;
-             long int k_uTime_WriteDelay_uS = 5; // delay between byte writes - needed for at28c16
+             long int k_uTime_WriteDelay_uS = 50; // delay between byte writes - needed for at28c16
 // (to be honest, both of the above are about ten times too big - but the Arduino won't reliably
 // delay down at the nanosecond level, so this is the best we can do.)
              long int SDPadr1=0x5555, SDPadr2=0x2AAA; // default 28C256
@@ -139,12 +141,18 @@ void loop()
       case 'U': SetSDPState(false); break;
       case 'R': ReadEEPROM(); break;
       case 'W': WriteEEPROM(); break;
-      case 'A': k_uTime_WriteDelay_uS=500;  
+      case 'A': k_uTime_WriteDelay_uS=100;  
                 SDPadr1=-1; SDPadr2=-1; Serial.println("Set params for 28C16");break;
       case 'B': k_uTime_WriteDelay_uS=5;  
                 SDPadr1=0x1555; SDPadr2=0x0AAA; Serial.println("Set params for 28C64");break;
       case 'C': k_uTime_WriteDelay_uS=5;  
                 SDPadr1=0x5555; SDPadr2=0x2AAA; Serial.println("Set params for 28C256");break;
+      case '+': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS+50;  
+                if (k_uTime_WriteDelay_uS > 500) k_uTime_WriteDelay_uS = 500; 
+                Serial.print("k_uTime_WriteDelay_uS=");Serial.println(k_uTime_WriteDelay_uS,DEC); break;
+      case '-': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS-50; 
+                if (k_uTime_WriteDelay_uS < 5) k_uTime_WriteDelay_uS = 5; 
+                Serial.print("k_uTime_WriteDelay_uS=");Serial.println(k_uTime_WriteDelay_uS,DEC); break;
       case 0: break; // empty string. Don't mind ignoring this.
       default: Serial.println("ERR Unrecognised command"); break;
     }
