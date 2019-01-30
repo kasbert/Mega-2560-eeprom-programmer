@@ -16,6 +16,8 @@
 //  06th Oct 2018 - P. Sieg
 //                - corrected SDP (un)protect adresses & k_uTime_WriteDelay_uS
 //                - Set parameters -A=28C16; -B=28C64; -C=28C256
+//  29th Jan 2019 - P. Sieg
+//                - Introduced + and - to alter k_uTime_WritePulse_uS
 //
 //
 // Distributed under an acknowledgement licence, because I'm a shallow, attention-seeking tart. :)
@@ -33,7 +35,7 @@
 // B                                      - set parameters for 28C64
 // C                                      - set parameters for 28C256
 // +                                      - k_uTime_WritePulse_uS + 50
-// -                                      - k_uTime_WritePulse_uS - 50
+// -                                      - k_uTime_WritePulse_uS - 25
 //
 // Any data read from the EEPROM will have a CRC checksum appended to it (separated by a comma).
 // If a string of data is sent with an optional checksum, then this will be checked
@@ -150,7 +152,7 @@ void loop()
       case '+': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS+50;  
                 if (k_uTime_WriteDelay_uS > 500) k_uTime_WriteDelay_uS = 500; 
                 Serial.print("k_uTime_WriteDelay_uS=");Serial.println(k_uTime_WriteDelay_uS,DEC); break;
-      case '-': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS-50; 
+      case '-': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS-25; 
                 if (k_uTime_WriteDelay_uS < 5) k_uTime_WriteDelay_uS = 5; 
                 Serial.print("k_uTime_WriteDelay_uS=");Serial.println(k_uTime_WriteDelay_uS,DEC); break;
       case 0: break; // empty string. Don't mind ignoring this.
