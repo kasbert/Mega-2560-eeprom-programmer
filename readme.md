@@ -40,11 +40,13 @@ Header from INO:
 //  06th Oct 2018 - P. Sieg
 //                - corrected SDP (un)protect adresses & k_uTime_WriteDelay_uS
 //                - Set parameters -A=28C16; -B=28C64; -C=28C256
+//  29th Jan 2019 - P. Sieg
+//                - Introduced + and - to alter k_uTime_WritePulse_uS
 //
 ```
 ---
 
-Python programming script:
+Python programming script (still a lot of issues - Linux: Need minicom to conect first and leave without reset; OSX: doesn't work at all - always get 'eh'):
 ```code
 #!/usr/bin/env python2.7
 # Uses the Arduino firmware given on http://danceswithferrets.org/geekblog/?p=496
