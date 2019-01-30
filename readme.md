@@ -46,7 +46,7 @@ Header from INO:
 ```
 ---
 
-Python programming script (still a lot of issues - Linux: Need minicom to conect first and leave without reset; OSX: doesn't work at all - always get 'eh'):
+Python programming script (still a lot of issues - Linux: Need minicom to connect first and leave without reset; OSX: doesn't work at all - always get 'eh'):
 ```code
 #!/usr/bin/env python2.7
 # Uses the Arduino firmware given on http://danceswithferrets.org/geekblog/?p=496
