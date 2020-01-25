@@ -8,57 +8,39 @@ http://danceswithferrets.org/geekblog/?p=496
 Just upload sketch into Mega 2560 arduino.
 Build and attach adapter (LED's + resistors are optional):
 
-PCB Eagle+Gerber (Elecrow/Jlcpcb) are in EEpromer.zip:
+PCB Eagle+Gerber (Elecrow/Jlcpcb) are in pcb:
 
-![PCB](https://github.com/petersieg/eeprom/blob/master/EEpromer.png)
+![PCB](/img/EEpromer.png)
 
 2 Jumper at 1 are for 28C256 and 28C64.
 2 Jumper at 2 are for 28C16.
 
 PCB's arrived and they work as expected.
 
-![JCLPCB](https://github.com/petersieg/eeprom/blob/master/EEprommer%20Adapter.jpeg)
+![JCLPCB](/img/EEprommer%20Adapter.jpeg)
 
-Header from INO:
+See eeprom.ino and eeprommer.py for details
 
-```code
-// EEPROM Programmer - code for an Arduino Mega 2560
-//
-// Written by K Adcock.
-//       Jan 2016 - Initial release
-//       Dec 2017 - Slide code tartups, to remove compiler errors for new Arduino IDE (1.8.5).
-//   7th Dec 2017 - Updates from Dave Curran of Tynemouth Software, adding commands to enable/disable SDP.
-//  10th Dec 2017 - Fixed one-byte EEPROM corruption (always byte 0) when unprotecting an EEPROM
-//                  (doesn't matter if you write a ROM immediately after, but does matter if you use -unprotect in isolation)
-//                - refactored code a bit (split loop() into different functions)
-//                - properly looked at timings on the Atmel datasheet, and worked out that my delays
-//                  during reads and writes were about 10,000 times too big!
-//                  Reading and writing is now orders-of-magnitude quicker.
-//  21st Feb 2018 - P. Sieg
-//                  static const long int k_uTime_WriteDelay_uS = 500; // delay between byte writes - needed for at28c16
-//                  delayMicroseconds(k_uTime_WritePulse_uS);
-//  06th Oct 2018 - P. Sieg
-//                - corrected SDP (un)protect adresses & k_uTime_WriteDelay_uS
-//                - Set parameters -A=28C16; -B=28C64; -C=28C256
-//  29th Jan 2019 - P. Sieg
-//                - Introduced + and - to alter k_uTime_WritePulse_uS
-//
-```
 ---
+Hardware variant 2 uses Meag 2560 Mini Pro.
 
-Python programming script (still a lot of issues - Linux: Need minicom to connect first and leave without reset; OSX: doesn't work at all - always get 'eh'):
-```code
-#!/usr/bin/env python2.7
-# Uses the Arduino firmware given on http://danceswithferrets.org/geekblog/?p=496
-#
-# -r start end (in decimal)
-# -s file.bin (programming)
-# -v file.bin (verify content)
-# -S file.bin ('smart' programming)
-#
-# Normally takes 196 seconds to program a 28C64, and 32 seconds to read.
-# --
-# Chris Baird,, <cjb@brushtail.apana.org.au> threw
-# this together during an all-nighter on 2017-Oct-19.
-# This version: 2017-Oct-25.
+Atmega 2560 Pins 31 - 4 are connected to EEPROM
 ```
+ D4---A14 -+---+- VCC---5V
+ D6---A12 -+ E +- /WE---D7
+ D8----A7 -+ E +- A13---D9
+D10----A6 -+ P +- A8----D11
+D12----A5 -+ R +- A9 ---D13
+D14----A4 -+ O +- A11---D15
+D16----A3 -+ M +- /OE---D17
+D18----A2 -+   +- A10---D19
+D20----A1 -+   +- /CE---D21
+D22----A0 -+   +- D7----D23
+D24----D0 -+   +- D6----D25
+D26----D1 -+   +- D5----D27
+D28----D2 -+   +- D4----D29
+GND---GND -+---+- D3----D31
+```
+![img1](/img/IMG_20200125_221945.jpg)
+![img1](/img/IMG_20200125_222004.jpg)
+
