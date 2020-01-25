@@ -22,7 +22,7 @@ PCB's arrived and they work as expected.
 See eeprom.ino and eeprommer.py for details
 
 ---
-Hardware variant 2 uses Meag 2560 Mini Pro.
+Hardware variant 2 uses Mega 2560 Pro Mini and the long side of pins.
 
 Atmega 2560 Pins 31 - 4 are connected to EEPROM
 ```
