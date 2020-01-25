@@ -18,6 +18,8 @@
 //                - Set parameters -A=28C16; -B=28C64; -C=28C256
 //  29th Jan 2019 - P. Sieg
 //                - Introduced + and - to alter k_uTime_WritePulse_uS
+//  25th Jan 2020 - J. Sonninen
+//                - Add read polling after write
 //
 //
 // Distributed under an acknowledgement licence, because I'm a shallow, attention-seeking tart. :)
@@ -50,8 +52,11 @@ const char hex[] =
   '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
 };
 
-const char version_string[] = {"EEPROM Version=0.04"};
+const char version_string[] = {"EEPROM Version=0.05-kasbert"};
 
+#define HW_VARIANT 0 // Select 1 or 2
+
+#if HW_VARIANT == 1
 static const int kPin_Addr14  = 24;
 static const int kPin_Addr12  = 26;
 static const int kPin_Addr7   = 28;
@@ -81,6 +86,40 @@ static const int kPin_Data3   = 51;
 static const int kPin_WaitingForInput  = 13;
 static const int kPin_LED_Red = 22;
 static const int kPin_LED_Grn = 53;
+#elif HW_VARIANT == 2
+static const int kPin_Addr14  = 4;
+static const int kPin_Addr12  = 6;
+static const int kPin_Addr7   = 8;
+static const int kPin_Addr6   = 10;
+static const int kPin_Addr5   = 12;
+static const int kPin_Addr4   = 14;
+static const int kPin_Addr3   = 16;
+static const int kPin_Addr2   = 18;
+static const int kPin_Addr1   = 20;
+static const int kPin_Addr0   = 22;
+static const int kPin_Data0   = 24;
+static const int kPin_Data1   = 26;
+static const int kPin_Data2   = 28;
+static const int kPin_nWE     = 7;
+static const int kPin_Addr13  = 9;
+static const int kPin_Addr8   = 11;
+static const int kPin_Addr9   = 13;
+static const int kPin_Addr11  = 15;
+static const int kPin_nOE     = 17;
+static const int kPin_Addr10  = 19;
+static const int kPin_nCE     = 21;
+static const int kPin_Data7   = 23;
+static const int kPin_Data6   = 25;
+static const int kPin_Data5   = 27;
+static const int kPin_Data4   = 29;
+static const int kPin_Data3   = 31;
+static const int kPin_WaitingForInput  = 48;
+static const int kPin_LED_Red = 50;
+static const int kPin_LED_Grn = 52;
+#else
+#error Select HW_VARIANT 1 or 2
+#endif
+
 
 byte g_cmd[80]; // strings received from the controller will go in here
 static const int kMaxBufferSize = 16;
@@ -88,9 +127,10 @@ byte buffer[kMaxBufferSize];
 
 static const long int k_uTime_WritePulse_uS = 1; 
 static const long int k_uTime_ReadPulse_uS = 1;
-             long int k_uTime_WriteDelay_uS = 50; // delay between byte writes - needed for at28c16
+             long int k_uTime_WriteDelay_uS = -1; // delay between byte writes - needed for at28c16
 // (to be honest, both of the above are about ten times too big - but the Arduino won't reliably
 // delay down at the nanosecond level, so this is the best we can do.)
+// -1 enables polling of written value. At least 28C64 reads inverted value until the write has completed.
              long int SDPadr1=0x5555, SDPadr2=0x2AAA; // default 28C256
 // the setup function runs once when you press reset or power the board
 void setup()
@@ -149,6 +189,8 @@ void loop()
                 SDPadr1=0x1555; SDPadr2=0x0AAA; Serial.println("Set params for 28C64");break;
       case 'C': k_uTime_WriteDelay_uS=5;  
                 SDPadr1=0x5555; SDPadr2=0x2AAA; Serial.println("Set params for 28C256");break;
+      case 'D': k_uTime_WriteDelay_uS=-1;  
+                Serial.println("Poll read after write");break;
       case '+': k_uTime_WriteDelay_uS=k_uTime_WriteDelay_uS+50;  
                 if (k_uTime_WriteDelay_uS > 500) k_uTime_WriteDelay_uS = 500; 
                 Serial.print("k_uTime_WriteDelay_uS=");Serial.println(k_uTime_WriteDelay_uS,DEC); break;
@@ -346,7 +388,28 @@ void WriteBufferToEEPROM(int addr, int size)
   for (uint8_t x = 0; x < size; ++x)
   {
     WriteByteTo(addr + x, buffer[x]);
-    delayMicroseconds(k_uTime_WriteDelay_uS);    
+    if (k_uTime_WriteDelay_uS >= 0) {
+      delayMicroseconds(k_uTime_WriteDelay_uS);
+    } else {
+      uint8_t i;
+      SetDataLinesAsInputs();
+      SetData(0); // disable pullups
+      for (i = 0; i < 100; ++i) {
+        digitalWrite(kPin_nCE, LOW);
+        delayMicroseconds(k_uTime_ReadPulse_uS);
+        byte b = ReadByteFrom(addr);
+        digitalWrite(kPin_nCE, HIGH);
+        if (buffer[x] == b) {
+          break;
+        }
+        Serial.print("*");
+      }
+      SetDataLinesAsOutputs();
+      if (i == 100) {
+        Serial.println("ERR");
+        return;
+      }
+    }
   }
   
   digitalWrite(kPin_LED_Red, LOW);
